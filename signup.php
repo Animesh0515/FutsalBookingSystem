@@ -1,0 +1,117 @@
+<html>
+    <head>
+        <title>Signup Page</title>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+<!-- Bootstrap css -->
+<link href="bootstrap\css\bootstrap.min.css" rel="stylesheet">
+
+<!-- Addtional stylesheet -->
+<script src="https://kit.fontawesome.com/33593f5208.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <style>
+	  .container {
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+}
+  </style>
+</head>
+<body>
+<?php include 'navbar.php'; ?>
+<?php if(isset($_GET['success']) && $_GET['success']){?>
+<div class="alert alert-success">
+<a href="#" class="close" data-dismiss="alert">&times;</a>
+ <strong>Successfull!</strong> Redirecting please wait.
+</div>
+<?php header('Refresh: 10; URL=http://yoursite.com/page.php'); ?>
+<?php } else if(isset($_GET['success']) && ! $_GET['success']) { ?>
+	<div class="alert alert-danger">
+<a href="#" class="close" data-dismiss="alert">&times;</a>
+ <strong>Something went wrong!</strong> Please check your internet connection and try again .
+</div>
+<?php } ?>
+<div class="container d-flex justify-content-center align-items-center"
+      style="padding-top:4rem;">
+      	<form class="border shadow p-3 rounded"
+      	      action="controls/check-signup.php" 
+      	      method="post" 
+      	      style="width: 450px;">
+      	      <h1 class="text-center p-3">SIGN UP</h1>
+      	      <?php if (isset($_GET['error'])) { ?>
+      	      <div class="alert alert-danger" role="alert">
+				  <?=$_GET['error']?>
+			  </div>
+			  <?php } ?>
+              <div class="mb-3">
+		    <label for="firstname" 
+		           class="form-label">First name</label>
+		    <input type="text" 
+		           class="form-control" 
+		           name="firstname" 
+		           id="firstname">				   
+		  </div>
+          <div class="mb-3">
+		    <label for="lastname" 
+		           class="form-label">Last name</label>
+		    <input type="text" 
+		           class="form-control" 
+		           name="lastname" 
+		           id="lastname">				   
+		  </div>
+          <div class="mb-3">
+		    <label for="address" 
+		           class="form-label">Address</label>
+		    <input type="text" 
+		           class="form-control" 
+		           name="address" 
+		           id="address">				   
+		  </div>
+          <div class="mb-3">
+		    <label for="phoneno" 
+		           class="form-label">Phone Number</label>
+		    <input type="text" 
+		           class="form-control" 
+		           name="phoneno" 
+		           id="phoneno">			   
+		  </div>
+		  <div class="mb-3">
+		    <label for="username" 
+		           class="form-label">User name</label>
+		    <input type="text" 
+		           class="form-control" 
+		           name="username" 
+		           id="username">
+				   
+		  </div>
+		  <div class="mb-3">
+		    <label for="password" 
+		           class="form-label">Password </label>
+		    <input type="password" 
+		           name="password" 
+		           class="form-control" 
+		           id="password">
+				  
+
+		  </div>
+		  <div class="mb-1">
+		    <label class="form-label">Select User Type:</label>
+		  </div>
+		  <select class="form-select mb-3"
+		          name="role" 
+		          aria-label="Default select example" style="width: 29rem">
+			  <option selected value="user">User</option>
+			  <option value="owner">Owner</option>
+		  </select>
+		 
+		  <button type="submit" 
+		          class="btn btn-primary">Signup</button>
+				  <span>OR</span>
+				  <a  href="login.php">Login</a>
+				  
+		</form>
+</body>
+    </html>
