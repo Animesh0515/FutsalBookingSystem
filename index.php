@@ -1,9 +1,12 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Home Page</title>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-
+    <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.js"></script>
     <!-- Bootstrap css -->
     <link href="bootstrap\css\bootstrap.min.css" rel="stylesheet">
 
@@ -101,20 +104,53 @@
       }
     } 
       </style>
+<script>
 
+function searchFutsal(futsalname)
+  {   
+    debugger;
+    if(futsalname=="")
+    {
+        alert("Enter the name of the futsal to search");
+    }
+    else
+    {
+    $.ajax({
+        url: "controls/find-futsal.php",
+        type: "post",
+        data: {name:futsalname}  ,
+        success: function (response) {
+          debugger;
+          if( response !="success")
+          {
+            alert("something went wrong !")
+
+          }      
+          else
+          {
+            window.location.href = "Futsals.php";
+          }     
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+           console.log(textStatus, errorThrown);
+        }
+    });
+  }
+  }
+  </script>
     
 </head>
     <body>
       <!-- Navbar -->
       <?php include 'navbar.php' ?> 
       
-      <!-- Image -->
+     
      <div class="main-content">
       <img src="assets/images/fustal.jpg" class="img-fluid" alt="..." style="width: 100%;height: 45rem;"/>
 
-      <!-- Text In Image -->
+     
       <div class="top-left" style="font-weight: 600; line-height: 1.2;">A New Futsal Booking<br/> Experience</div>
-      <div class="button_top-left"><a href="#">Book Now</a></div>
+      <div class="button_top-left"><a href="Futsals.php">Book Now</a></div>
     
      <div class="icon_boxes">
 		<div class="container">
@@ -166,10 +202,10 @@
                 <h2 style="font-weight: 800;">Book your <em style="color:white;">Favourite Futsal</em></h2>
                 <span style="color:white;">Search for your favourite fustal and book it now !</span>
                 <form class="d-flex" style="margin-bottom: 0.7rem;">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" style="margin-right: 0.5rem">
-                <button class="btn" type="button">Search</button>
+                <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search" style="margin-right: 0.5rem">
+                <button class="btn" type="button" onclick="searchFutsal(search.value)">Search</button>
               </form>
-                <a href="about.html" class="filled-button" style="margin-top:0.2rem; color:white;">Show All</a>
+                <a href="Futsals.php" class="filled-button" style="margin-top:0.2rem; color:white;">Show All</a>
               </div>
             </div>
          

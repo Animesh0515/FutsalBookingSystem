@@ -1,5 +1,6 @@
 <?php
 include "controls/connection.php";
+session_start();
 ?>
 
 <html lang="en">
@@ -19,46 +20,95 @@ include "controls/connection.php";
       margin-left: -0.9375rem !important;
       }
 
+
+      .footer_overlay {   
+    margin-top: 17rem;
+}
       @media (max-width: 991.98px){
       .row {
           padding-left: 0rem !important;
           width: 100% !important;
+          justify-content: space-evenly !important;
       }
     }
     </style>
+<script>
+  function searchFutsal(futsalname)
+  {   
+    debugger;
+    if(futsalname=="")
+    {
+        alert("Enter the name of the futsal to search");
+    }
+    else
+    {
+    $.ajax({
+        url: "controls/find-futsal.php",
+        type: "post",
+        data: {name:futsalname}  ,
+        success: function (response) {
+          debugger;
+          if( response !="success")
+          {
+            alert("something went wrong !")
 
-
+          }      
+          else
+          {
+            window.location.reload();
+          }     
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+           console.log(textStatus, errorThrown);
+        }
+    });
+  }
+  }
+</script>
 </head>
 <body>
     <!-- Navbar -->
     <?php include 'navbar.php' ?> 
-    <div class="main-content">
-    <div class="futsal-content" style="padding-top:3rem; padding-left: 33rem">    
-    <form class="d-flex" style="width:40rem;">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" style="margin-right: 0.5rem">
-                <button class="btn" type="button">Search</button>
-              </form>
-    </div>
-    <div class="row" style=" justify-content: space-around;">
-    <?php 
-       $futsals = $conn->query("SELECT * FROM futsals");
+    <?php
+    if(isset( $_SESSION["searchedItems"]))
+    {
+        $futsals=$_SESSION["searchedItems"];
+    }
+    else{
+       $futsals = $conn->query("SELECT * FROM futsals where deletedflag='N' and approvedflag='Y'");
        if ($futsals) {
            $futsals = mysqli_fetch_all($futsals);
+       }
+      }
+    ?>
+    <div class="main-content">
+    <div class="futsal-content" style="padding-top:3rem; padding-left: 33rem">    
+    <form  class="d-flex" style="width:40rem;">
+                <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search" style="margin-right: 0.5rem" value=<?php if(isset( $_SESSION["searchedText"])){ echo $_SESSION["searchedText"]; }?>>
+                <button class="btn" type="button" onclick="searchFutsal(search.value)">Search</button>
+              </form>
+    </div>
+    
+    <div class="row" style=" justify-content: space-between;padding-right: 4rem;padding-left: 4rem;">
+    <?php 
+    if(! empty ($futsals ))
+    {
     foreach($futsals as $futsal){?>
     <div class="card border-dark mb-3" style="max-width: 37rem;">
-  <div class="row g-0">
+  <div class="row g-0" style="width: 39rem;">
     <div class="col-md-4">
       <?php
        $image = $conn->query("SELECT ImageUrl FROM futsalimages where FutsalID=$futsal[0] limit 1");
        $image = mysqli_fetch_all($image);
       ?>
-      <img src=<?=(string)$image[0][0]?> class="img-fluid rounded-start" alt="..." style="padding: 1rem; height: 100%;">
+      <img src=<?=(string)$image[0][0]?> class="img-fluid rounded-start" alt="..." style="padding: 0.2rem; height: 14.5rem;">
     </div>
     <div class="col-md-8" style="max-width: 23rem;">
       <div class="card-body">
         <h5 class="card-title"><?=$futsal[1]?></h5>
-        <p class="card-text">Location: <?=$futsal[2]?><br/>Contact No: <?=$futsal[3]?><br/>Price:<?=$futsal[5]?> per hour</p>             
-        <button type="button"  data-bs-toggle="modal" data-bs-target="#exampleModal"><img src="assets/icons/location.svg" alt="" style="height: 2rem;"></button>
+        <p class="card-text">Location: <?=$futsal[2]?><br/>Contact No: <?=$futsal[3]?><br/>Price:<?=$futsal[5]?> per hour</p> 
+        <a href="http://maps.google.com/?q=<?=$futsal[6]?>, <?=$futsal[7]?>" target="_blank">            
+        <button type="button" ><img src="assets/icons/location.svg" alt="" style="height: 2rem;"></button>
         <button type="button" class="btn btn-info" onClick="RedirectTo(<?=$futsal[0]?>)">Details</button>
         <button type="button" class="btn btn-dark" onClick="RedirectTo(<?=$futsal[0]?>)">Book</button>
 
@@ -77,7 +127,10 @@ include "controls/connection.php";
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <a href="http://maps.google.com/?q=27.700738470566627, 85.28586991255817" target="_blank">
+  <button  class="btn btn-primary"> Click Me</button>
+</a>
+        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
       </div>
     </div>
   </div>
@@ -130,7 +183,11 @@ include "controls/connection.php";
 </div> -->
 
 </div>
-<?php include 'footer.html' ?> 
+<?php include 'footer.html' ;
+
+unset($_SESSION["searchedItems"]);
+unset($_SESSION["searchedText"]);
+?> 
 </body>
 
 <script>

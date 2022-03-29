@@ -23,7 +23,7 @@
     <body>
         <?php include 'navbar.php'?>
         <div class="container d-flex justify-content-center align-items-center"
-      style="min-height: 35rem">
+      style="min-height: 35rem; padding-top: 3rem;">
       	<form class="border shadow p-3 rounded"
       	      action="controls/check-login.php" 
       	      method="post" 

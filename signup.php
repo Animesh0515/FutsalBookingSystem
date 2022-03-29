@@ -18,16 +18,36 @@
     margin-right: auto;
     margin-left: auto;
 }
+
+.response{
+	padding-top: 4.6rem;
+}
+
+@media (max-width: 991.98px){
+	.response{
+	padding-top: 0rem;
+}
+}
   </style>
+  <script>
+	  function successredirect()
+	  {
+		  
+	  }
+	</script>
 </head>
 <body>
 <?php include 'navbar.php'; ?>
+
 <?php if(isset($_GET['success']) && $_GET['success']){?>
-<div class="alert alert-success">
-<a href="#" class="close" data-dismiss="alert">&times;</a>
- <strong>Successfull!</strong> Redirecting please wait.
+	<div class="response" >
+<div class="alert alert-success"><a href="#" class="close" data-dismiss="alert">&times;</a><strong>Successfull!Redirecting please wait.</strong> </div>
 </div>
-<?php header('Refresh: 10; URL=http://yoursite.com/page.php'); ?>
+<?php echo'<script type="text/javascript">',
+		'setTimeout(function () {',
+   'window.location.href= "index.php";', 
+	'},5000);',
+	'</script>'; ?>
 <?php } else if(isset($_GET['success']) && ! $_GET['success']) { ?>
 	<div class="alert alert-danger">
 <a href="#" class="close" data-dismiss="alert">&times;</a>
@@ -35,7 +55,7 @@
 </div>
 <?php } ?>
 <div class="container d-flex justify-content-center align-items-center"
-      style="padding-top:4rem;">
+      style="padding-top:6rem;">
       	<form class="border shadow p-3 rounded"
       	      action="controls/check-signup.php" 
       	      method="post" 

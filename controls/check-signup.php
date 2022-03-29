@@ -47,7 +47,7 @@ if(isset($_POST['firstname']) && isset($_POST['lastname']) && isset($_POST['addr
             }
             else{
               $success=false;
-              header("Location: ../Signup.php??success=true");
+              header("Location: ../Signup.php?success=true");
             }
 
 

@@ -1,7 +1,7 @@
 <?php
 
 // To connect to database
-
+global $conn;
 $serverName = "localhost";
     $database = "futsalbooking";
     $username = "root";
@@ -9,7 +9,7 @@ $serverName = "localhost";
 
     // Start connection
 
-    $conn = mysqli_connect($serverName,$username,$dbpassword,$database);
+     $conn = mysqli_connect($serverName,$username,$dbpassword,$database);
     if (!$conn) {
         // Show error here
         // echo mysqli_connect_error();
