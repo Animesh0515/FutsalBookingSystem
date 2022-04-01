@@ -1,7 +1,7 @@
 <?php
 
 //function to upload image
-function uploadImage($files, $futsalID, $conn, $directory)
+function uploadImage($files, $futsalID=null, $conn, $directory, $userid=null)
 {
     $target_dir = $directory;
     $count=0;
@@ -39,7 +39,14 @@ function uploadImage($files, $futsalID, $conn, $directory)
         $a=count($files['name']);
         if($count == count($files['name']))
         {
+            if($userid==null)
+            {
             $result=imageDataInsert($futsalID, $filenames,$conn);
+            }
+            else
+            {
+                $result=userImageDataInsert($userid, $filenames, $conn);
+            }
             if($result=="success")
             {
             return "true";
@@ -69,6 +76,17 @@ function imageDataInsert($futsalid, $filenames,$conn)
         return "success";
     }
     
+}
+
+function userImageDataInsert($userid, $filenames,$conn)
+{
+    $url="assets/images/Profile/".$filenames[0];
+    $sql = "Update users set ImageUrl='$url' where userid='$userid'";    
+    $result = mysqli_query($conn, $sql);
+    if($result)
+    {
+        return "success";
+    }
 }
 
 ?>

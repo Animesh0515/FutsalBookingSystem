@@ -53,7 +53,7 @@ if(isset($_POST['delete']) && ! empty($_POST['delete']))
   $result = mysqli_query($conn, $sql);
   if($result)
   {
-    header("Location: MyRegistrations.php");
+    header("Location: MyRegistrations.php?success=Image deleted successfully.");
   }
 
 
@@ -69,9 +69,9 @@ if(isset($_FILES['files']) && ! empty($_FILES['files']))
   else
   {
     $uploaded=uploadImage($_FILES['files'], $_POST['upload'], $conn, "assets/images/Futsals/");
-    if($uploaded=="true")
+      if($uploaded=="true")
     {
-      header("Location: MyRegistrations.php");
+      header("Location: MyRegistrations.php?success=Image uploaded succesfully.");
     }
     else
     {
@@ -84,6 +84,18 @@ else
 {
   header("Location: MyRegistrations.php?error=Select some image file first.");
 }
+}
+
+if(isset($_POST['FutsalID']) && ! empty($_POST['FutsalID']))
+{
+  $futsalid=$_POST['FutsalID'];
+  $sql="update futsals set deletedflag='Y' where futsalid='$futsalid'";
+  $result = mysqli_query($conn, $sql);
+  if($result)
+  {
+      return "success";
+  }
+
 }
 session_start();
 ?>
@@ -217,37 +229,37 @@ session_start();
         </style>
 
         <script>
-          function edit()
+          function edit(id)
           {
             debugger;
-            document.getElementById("name").disabled = false;
-            document.getElementById("location").disabled = false;
-            document.getElementById("contact").disabled = false;
-            document.getElementById("description").disabled = false;
-            document.getElementById("price").disabled = false;
-            document.getElementById("longitude").disabled = false;
-            document.getElementById("latitude").disabled = false;
-            document.getElementById("btnedit").hidden = true;
-            document.getElementById("btnsubmit").hidden = false;
-            document.getElementById("btncancel").hidden = false;
-            $(".the_checkbox:checkbox").attr("disabled", false); //enabling checkboxes
+            document.getElementById("name"+id).disabled = false;
+            document.getElementById("location"+id).disabled = false;
+            document.getElementById("contact"+id).disabled = false;
+            document.getElementById("description"+id).disabled = false;
+            document.getElementById("price"+id).disabled = false;
+            document.getElementById("longitude"+id).disabled = false;
+            document.getElementById("latitude"+id).disabled = false;
+            document.getElementById("btnedit"+id).hidden = true;
+            document.getElementById("btnsubmit"+id).hidden = false;
+            document.getElementById("btncancel"+id).hidden = false;
+            $(".the_checkbox"+id+":checkbox").attr("disabled", false); //enabling checkboxes
             
             
           }
 
-          function cancel()
+          function cancel(id)
           {
-            document.getElementById("name").disabled = false;
-            document.getElementById("location").disabled = true;
-            document.getElementById("contact").disabled = true;
-            document.getElementById("description").disabled = true;
-            document.getElementById("price").disabled = true;
-            document.getElementById("longitude").disabled = true;
-            document.getElementById("latitude").disabled = true;
-            document.getElementById("btnedit").hidden = false;
-            document.getElementById("btnsubmit").hidden = true;
-            document.getElementById("btncancel").hidden = true;
-            $(".the_checkbox:checkbox").attr("disabled", true);//disabling checkboxes 
+            document.getElementById("name"+id).disabled = false;
+            document.getElementById("location"+id).disabled = true;
+            document.getElementById("contact"+id).disabled = true;
+            document.getElementById("description"+id).disabled = true;
+            document.getElementById("price"+id).disabled = true;
+            document.getElementById("longitude"+id).disabled = true;
+            document.getElementById("latitude"+id).disabled = true;
+            document.getElementById("btnedit"+id).hidden = false;
+            document.getElementById("btnsubmit"+id).hidden = true;
+            document.getElementById("btncancel"+id).hidden = true;
+            $(".the_checkbox"+id+":checkbox").attr("disabled", true);//disabling checkboxes 
 
           }
 
@@ -286,11 +298,44 @@ session_start();
         }
     });
           }
+
+          function deleteFutsal(futsalid)
+          {
+            debugger;
+            var confirmAction = confirm("Are you sure to delete this futsal?");
+            if (confirmAction) {
+              $.ajax({
+            url: "MyRegistrations.php",
+            type: "post",
+            data: {FutsalID:futsalid} , 
+            success: function (response) {
+              debugger;
+              if(response="success")
+              {
+                            
+                window.location.reload();
+
+              }
+              
+              else
+              {
+                alert("something went wrong !")
+              }
+            },       
+            error: function(jqXHR, textStatus, errorThrown) {
+              console.log(textStatus, errorThrown);
+            }
+        });
+        } 
+          }
         </script>
 </head>
 <body>
 <?php include 'navbar.php' ?> 
-<?php if(isset($_GET['success']) && $_GET['success']){?>
+<?php if(isset($_GET['success']) && $_GET['success']){
+  $response=$_GET['success'];
+  if($_GET['success']=='true'){?>
+  
 	<div class="response" id="message">
 <div class="alert alert-success" ><strong> Updated Successfull!</strong><img src="assets/icons/cancel.svg" alt="" style="height: 1rem;float: right;" onclick="closeMessage()"> </div>
 </div>
@@ -300,6 +345,18 @@ session_start();
 	'},5000);',
 	'</script>'; ?>
 <?php }
+else
+{?>
+<div class="response" id="message">
+<div class="alert alert-success" ><strong> <?=$_GET['success']?></strong><img src="assets/icons/cancel.svg" alt="" style="height: 1rem;float: right;" onclick="closeMessage()"> </div>
+</div>
+<?php echo'<script type="text/javascript">',
+		'setTimeout(function () {',
+   'document.getElementById("response").hidden = true;', 
+	'},5000);',
+	'</script>'; ?>
+<?php }
+}
 elseif(isset($_GET['error']) && $_GET['error']){
   ?>
   <div class="response" id="message">
@@ -309,12 +366,17 @@ elseif(isset($_GET['error']) && $_GET['error']){
 <div class="registration-content" style="padding:6rem; padding-top:5rem">
 <?php
 $userID=$_SESSION['id'];
-$sql="Select * from futsals where createdby=".$userID."";
-$myRegistration=$conn->query("Select * from futsals where createdby=".$userID."");
+$sql="Select * from futsals where createdby=".$userID." and deletedflag='N'";
+$myRegistration=$conn->query("Select * from futsals where createdby=".$userID." and deletedflag='N'");
 if($myRegistration)
 {
   $myRegistration=mysqli_fetch_all($myRegistration);
 }
+if(count($myRegistration)==0)
+{
+  ?>
+  <div style="text-align: center; font-size: 4rem;color: grey;">No registrations yet</div>
+<?php }
 foreach($myRegistration as $register)
 {
 ?>
@@ -322,6 +384,18 @@ foreach($myRegistration as $register)
 <div class="card" style="margin-bottom:2rem; margin-left: 3rem;">
   <div class="card-header" style="font-size: 2rem;">
     <?=$register[1]?>
+   <?php
+   if($register[10]=="N")
+   {
+   ?>
+    <span style="float:right;font-size: 1.5rem;">Approval Status:<em style="font-size: 1.5rem;color: deepskyblue;padding-right: 2rem;">Pending</em> <img src="assets/icons/Delete.svg" alt="" style="height: 1rem;" onclick="deleteFutsal(<?=$register[0]?>)"></span>
+    <?php    }
+    else{
+      ?>
+  <span style="float:right;font-size: 1.5rem;">Approval Status:<em style="font-size: 1.5rem;color: lightgreen;padding-right: 2rem;">Approved</em> <img src="assets/icons/Delete.svg" alt="" style="height: 1rem;" onclick="deleteFutsal(<?=$register[0]?>)"></span>
+   <?php } ?>
+
+
   </div>
   <form class="border shadow p-3 rounded"
       	      action="" 
@@ -332,7 +406,7 @@ foreach($myRegistration as $register)
        <p class="card-text" style="padding: 0.5rem;">Name:</p><input type="text" 
 		           class="form-control" 
 		           name="name" 
-		           id="name"
+		           id="name<?=$register[0]?>"
                value="<?=$register[1]?>"
                disabled style="width: 30rem;margin-left: 3.5rem;">
     </div>
@@ -340,7 +414,7 @@ foreach($myRegistration as $register)
        <p class="card-text" style="padding: 0.5rem;">Location:</p><input type="text" 
 		           class="form-control" 
 		           name="location" 
-		           id="location"
+		           id="location<?=$register[0]?>"
                value="<?=$register[2]?>"
                disabled style="width: 30rem;margin-left: 2.3rem;">
     </div>
@@ -348,19 +422,19 @@ foreach($myRegistration as $register)
        <p class="card-text" style="padding: 0.5rem;">Contact No:</p><input type="text" 
 		           class="form-control" 
 		           name="contact" 
-		           id="contact"
+		           id="contact<?=$register[0]?>"
                value="<?=$register[3]?>"
                disabled style="width: 30rem;margin-left: 1rem;">
     </div>
     <div class="row" style="width: 100%; margin-left: 0.5rem;">
        <p class="card-text" style="padding: 0.5rem;">Description:</p> 
-       <textarea rows = "3"  name = "description" id="description"  style=" width: 72%; margin-bottom: 1.5rem; margin-left: 1rem;" disabled><?=$register[4]?>"</textarea>	
+       <textarea rows = "3"  name = "description" id="description<?=$register[0]?>"  style=" width: 72%; margin-bottom: 1.5rem; margin-left: 1rem;" disabled><?=$register[4]?></textarea>	
     </div>
     <div class="row" style="width: 100%; margin-left: 0.5rem;">
        <p class="card-text" style="padding: 0.5rem;">Price:</p><input type="text" 
 		           class="form-control" 
 		           name="price" 
-		           id="price"
+		           id="price<?=$register[0]?>"
                value="<?=$register[5]?>"
                disabled style="width: 30rem;margin-left: 4rem;">
     </div>
@@ -368,7 +442,7 @@ foreach($myRegistration as $register)
        <p class="card-text" style="padding: 0.5rem;">Longitude:</p><input type="text" 
 		           class="form-control" 
 		           name="longitude" 
-		           id="longitude"
+		           id="longitude<?=$register[0]?>"
                value="<?=$register[6]?>"
                disabled style="width: 30rem;margin-left: 1.5rem;">
     </div>
@@ -376,7 +450,7 @@ foreach($myRegistration as $register)
        <p class="card-text" style="padding: 0.5rem;">Latitude:</p><input type="text" 
 		           class="form-control" 
 		           name="latitude" 
-		           id="latitude"
+		           id="latitude<?=$register[0]?>"
                value="<?=$register[7]?>"
                disabled style="width: 30rem;margin-left: 2.3rem;">
     </div>
@@ -412,7 +486,7 @@ foreach($myRegistration as $register)
         }
       ?>    
    
-    <label style="margin-right: 1rem;"> <input type="checkbox" rel="time" name="time[]" class="the_checkbox" value="<?=$time[0]?>"  disabled  <?=$status?> style="width: 2rem !important;"><?=$time[1]?> </label>     
+    <label style="margin-right: 1rem;"> <input type="checkbox" rel="time" name="time[]" class="the_checkbox<?=$register[0]?>" value="<?=$time[0]?>"  disabled  <?=$status?> style="width: 2rem !important;"><?=$time[1]?> </label>     
     <?php
      $status="";
     }?>
@@ -423,9 +497,9 @@ foreach($myRegistration as $register)
     </div>
        
       
-    <a href="#" class="btn btn-primary" id="btnedit" onclick="edit()" style="width: 5rem; margin-left: 0.2rem;">Edit</a>    
-    <button type="submit" name="submit" id="btnsubmit"  class="btn btn-success" style="width: 5rem;" hidden value="<?=$register[0]?>">Save</button>
-    <a href="#" class="btn btn-danger" id="btncancel" onclick="cancel()" style="width: 5rem;" hidden>Cancel</a>
+    <a href="#" class="btn btn-primary" id="btnedit<?=$register[0]?>" onclick="edit(<?=$register[0]?>)" style="width: 5rem; margin-left: 0.2rem;">Edit</a>    
+    <button type="submit" name="submit" id="btnsubmit<?=$register[0]?>"  class="btn btn-success" style="width: 5rem;" hidden value="<?=$register[0]?>">Save</button>
+    <a href="#" class="btn btn-danger" id="btncancel<?=$register[0]?>" onclick="cancel(<?=$register[0]?>)" style="width: 5rem;" hidden>Cancel</a>
   </form>
   </div>
   <div class="card-body" style="width:31rem;">
