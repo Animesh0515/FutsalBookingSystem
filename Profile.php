@@ -100,7 +100,17 @@ session_start();
     <script type="text/javascript" charset="utf8" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.js"></script>
     
         <link href="bootstrap\css\bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="assets/css/style.css">      
+        <link rel="stylesheet" href="assets/css/style.css">
+        <style>
+           @media (max-width: 991.98px){
+      .row {
+          padding-left: 0rem !important;
+          width: 100% !important;
+          justify-content: space-evenly !important;
+          margin-left:0rem !important
+            }
+          }
+        </style>      
         <script>
           function closeMessage()
           {
@@ -183,7 +193,7 @@ elseif(isset($_GET['error']) && $_GET['error']){
   <div class="alert alert-danger" ><strong><?=$_GET['error']?></strong><img src="assets/icons/cancel.svg" alt="" style="height: 1rem;float: right;" onclick="closeMessage()"> </div>
   </div>
 <?php }?>
-<div class="row" style="width:100%; margin-left: 10rem !important;margin-top: 2rem;">
+<div class="row" style="width:100%; margin-left: 10rem ;margin-top: 2rem;">
 <form action="" method="post" enctype="multipart/form-data">
 <div class="card text-center" style="width: 30rem; height:30rem;"> 
   <h5 class="card-header">Profile Picture</h5> 

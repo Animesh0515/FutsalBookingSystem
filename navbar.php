@@ -18,7 +18,7 @@
           <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav " >
               <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="index.php">Home</a>
+                <a class="nav-link" aria-current="page" href="index.php">Home</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/Futsals.php">Futsals</a>
@@ -39,10 +39,13 @@
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="FutsalRegistration.php">Register Futsal</a></li>
                         <li><a class="dropdown-item" href="MyRegistrations.php">My Registrations</a></li>
-                        <li>
+                        <li><a class="dropdown-item" href="AllRegistrations.php">All Registrations</a></li>
+                        <li><a class="dropdown-item" href="UserBookings.php">User Bookings</a></li>
+                        <li><a class="dropdown-item" href="Users.php">Users</a></li>
+                        <!-- <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li> -->
                     </ul>
                 </li>                
             </ul>
@@ -59,6 +62,7 @@
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                   <li><a class="dropdown-item" href="Profile.php">My Profile</a></li>
+                  <li><a class="dropdown-item" href="MyBookings.php">My Bookings</a></li>
                   <li><a class="dropdown-item" href="logout.php">Logout</a></li>
                  
                 </ul>

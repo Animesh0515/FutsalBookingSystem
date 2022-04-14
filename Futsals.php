@@ -26,8 +26,9 @@ session_start();
 }
       @media (max-width: 991.98px){
       .row {
-          padding-left: 0rem !important;
+          padding-left: 3rem !important;
           width: 100% !important;
+          padding-right: 0rem !important;
           justify-content: space-evenly !important;
       }
     }
@@ -80,15 +81,22 @@ session_start();
            $futsals = mysqli_fetch_all($futsals);
        }
       }
-    ?>
-    <div class="main-content">
+    ?>   
+    <div class="main-content">    
     <div class="futsal-content" style="padding-top:3rem; padding-left: 33rem">    
     <form  class="d-flex" style="width:40rem;">
                 <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search" style="margin-right: 0.5rem" value=<?php if(isset( $_SESSION["searchedText"])){ echo $_SESSION["searchedText"]; }?>>
                 <button class="btn" type="button" onclick="searchFutsal(search.value)">Search</button>
               </form>
     </div>
-    
+    <?php
+    if( empty($futsals))
+    {?>
+      <div style="text-align: center; font-size: 4rem;color: grey;">No registrations yet</div>
+    <?php }
+    else
+    {
+    ?>
     <div class="row" style=" justify-content: space-between;padding-right: 4rem;padding-left: 4rem;">
     <?php 
     if(! empty ($futsals ))
@@ -181,7 +189,7 @@ session_start();
     </div>
   </div>
 </div> -->
-
+<?php }?>
 </div>
 <?php include 'footer.html' ;
 

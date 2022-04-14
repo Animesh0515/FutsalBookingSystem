@@ -28,7 +28,7 @@ include "controls/functions.php";
             $insertime=mysqli_query($conn, "Insert into futsaltime(FutsalID, TimeID) values('$futsalid', '$time')");
             if(! $insertime)
             {
-              header("Location: ../MyRegistrations.php?error=something went wrong!");
+              header("Location: MyRegistrations.php?error=something went wrong!");
             }
           }
           header("Location: ../MyRegistrations.php?success=true");   
@@ -223,6 +223,10 @@ session_start();
           #timeid{
             width: 55rem !important;
           }
+          .futsal-content {
+          padding-top: 1rem !important;
+          padding-left: 11rem !important;
+          }
          
 
           }
@@ -328,6 +332,39 @@ session_start();
         });
         } 
           }
+
+  function searchFutsal(futsalname, approvedflag)
+  {   
+    debugger;
+    if(futsalname=="" && approvedflag=="")
+    {
+        
+      alert("Enter the name of the futsal to search");
+    }
+    else
+    {
+    $.ajax({
+        url: "controls/find-futsal.php",
+        type: "post",
+        data: {name:futsalname, flag:approvedflag}  , 
+        success: function (response) {
+          debugger;
+          if( response !="success")
+          {
+            alert("something went wrong !")
+
+          }      
+          else
+          {
+            window.location.reload();
+          }     
+        },      
+        error: function(jqXHR, textStatus, errorThrown) {
+           console.log(textStatus, errorThrown);
+        }
+    });
+  }
+  }
         </script>
 </head>
 <body>
@@ -364,13 +401,37 @@ elseif(isset($_GET['error']) && $_GET['error']){
   </div>
 <?php }?>
 <div class="registration-content" style="padding:6rem; padding-top:5rem">
+ <div class="futsal-content" style="padding-left: 32rem">    
+ <!-- <em style="font-size: 0.7rem;color: red; width: 6rem; padding-top: 0.5rem;" hidden>**Field empty**</em>               -->
+
+    <form  class="d-flex" style="width:40rem;">  
+                <input class="form-control me-2" name="search" type="search" placeholder="Search" aria-label="Search"  value=<?php if(isset( $_SESSION["searchedText"])){ echo $_SESSION["searchedText"]; }?>>
+                <select class="form-select mb-3"
+		          name="flag" 
+		          aria-label="Default select example" style="width: 6rem; height: 2.4rem; margin-right: 1rem;">
+              <option disabled selected value>Status</option>
+			        <option value="Y">Approved</option>
+			           <option value="N">Pending</option>
+		  </select>
+                <button class="btn" type="button" onclick="searchFutsal(search.value, flag.value)" style="height: 2.4rem;">Search</button>
+              </form>
+              
+      
+    </div>
 <?php
 $userID=$_SESSION['id'];
+if(isset( $_SESSION["searchedItems"]))
+{
+    $myRegistration=$_SESSION["searchedItems"];
+}
+else
+{
 $sql="Select * from futsals where createdby=".$userID." and deletedflag='N'";
-$myRegistration=$conn->query("Select * from futsals where createdby=".$userID." and deletedflag='N'");
+$myRegistration=$conn->query("Select * from futsals where deletedflag='N'");
 if($myRegistration)
 {
   $myRegistration=mysqli_fetch_all($myRegistration);
+}
 }
 if(count($myRegistration)==0)
 {
@@ -457,7 +518,7 @@ foreach($myRegistration as $register)
 
     <div class="mb-1" style="width: 15rem;">
     <div class="row" style="width: 40rem;" id="timeid">
-    <p class="card-text" style="padding: 0.5rem; padding-left: 2rem; ">Time:</p>
+    <p class="card-text" style="padding: 0.5rem; ">Time:</p>
         <div class="filter"> 
       <div class="tags"> 
    <div class="col"> 
@@ -540,7 +601,10 @@ foreach($myRegistration as $register)
   </div>
 </div>
 </div>
-<?php }?>
+<?php }
+unset($_SESSION["searchedItems"]);
+unset($_SESSION["searchedText"]);
+?>
   </form>
 </div>
 </body>

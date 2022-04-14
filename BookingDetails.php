@@ -1,22 +1,24 @@
 <?php
 include "controls/connection.php";
-if(isset($_GET['q']) && $_GET['q']=="fu")
-{
-  header("Location:http://localhost:59392/index.php"); 
-  exit();
-}
+$message;
+// if(isset($_GET['q']) && $_GET['q']=="fu")
+// {
+//   header("Location:http://localhost:59392/index.php"); 
+//   exit();
+// }
 session_start();
 if(isset($_GET['q']) && $_GET['q']=="su")
 {
   if(isset( $_SESSION['bookedDetails']) && ! empty( $_SESSION['bookedDetails']))
   {
+    $amount=intval($_GET['amt']);
     $futsalid= $_SESSION['bookedDetails'][0]["futsalID"];
     $bookeddate= strtotime($_SESSION['bookedDetails'][0]["day"]);
     $bookeddate = date('m/d/Y',$bookeddate);
     $bookedtime= $_SESSION['bookedDetails'][0]["time"];
     $userid=$_SESSION['id'];
     $todaysdate=date("m/d/Y");
-    $sql = "Insert into futsalbooking(UserID, FutsalTimeID, BookedDate, BookedFor) values('$userid', '$bookedtime','$todaysdate','$bookeddate')";
+    $sql = "Insert into futsalbooking(UserID, FutsalTimeID, BookedDate, BookedFor, AdvanceAmount) values('$userid', '$bookedtime','$todaysdate','$bookeddate', '$amount')";
     $result = mysqli_query($conn, $sql);
     if($result)
     {
@@ -142,17 +144,17 @@ function redirect() {
         data: {Time:date, ID:id} ,
         success: function (response) {
           debugger;
-          if(response="success")
+          if(response=="success")
           {
             document.getElementById("errortxt").style.display = "none";             
             window.location.reload();
 
           }
-          elseif(response="full")
+          else if(response=="full")
           {
             document.getElementById("errortxt1").style.display = "contents"; 
           }
-          elseif(response="error")
+          else if(response=="error")
            {
             alert("something went wrong !")
           }
@@ -191,7 +193,7 @@ if(isset($message))
   if($message=="success")
   {?>
 <div class="alert alert-success" role="alert" id="message">
-				  success <img src="assets/icons/cancel.svg" alt="" style="height: 1rem;float: right;" onclick="closeMessage()">
+				  Booking successful. <img src="assets/icons/cancel.svg" alt="" style="height: 1rem;float: right;" onclick="closeMessage()">
 			  </div>
         <?php }
   elseif($message="error")
@@ -276,14 +278,14 @@ if(isset($message))
       $futsals = mysqli_fetch_all($futsals);
      }
    ?>
-<form action="" method="post" >
+<form action="controls/EsewaPayment.php" method="post" >
 <div class="card" style="width: 50rem;height: 30.5rem;">
   <div class="card-header" style="font-size: 2rem;">
     <?=$futsals[0][1]?>
   </div>
   <div class="card-body">
     <h5 class="card-title" ><?=$futsals[0][4]?></h5>
-    <p class="card-text"><img src="assets/icons/location2.svg" alt="" style="height: 2rem;"><?=$futsals[0][2]?><br/><img src="assets/icons/contact.svg" alt="" style="height: 2rem;">&nbsp;<?=$futsals[0][3]?><span style="margin-left: 32rem;font-size: 1.5rem;color: red;">Price:<?=$futsals[0][5]?></span></p>
+    <p class="card-text"><img src="assets/icons/location2.svg" alt="" style="height: 2rem;"><?=$futsals[0][2]?><br/><img src="assets/icons/contact.svg" alt="" style="height: 2rem;">&nbsp;<?=$futsals[0][3]?><span style="margin-left: 32rem;font-size: 1.5rem;color: red;" ><input type="text" value="<?=$futsals[0][5]?>" name="Price" hidden></input>Price:<?=$futsals[0][5]?></span></p>
     <p class="card-text">Select Date:
       <?php
       if(!empty($_SESSION['selectedDate']))
@@ -323,96 +325,9 @@ if(isset($message))
     $disabletxt="";
    }
    ?>
-   <input type="submit"  name="submit" id="btnBook" class="btn btn-primary" value="Book Now" <?=$disabletxt?>>
+   <button type="submit"  name="submit" id="btnBook" class="btn btn-primary" value="<?=$futsals[0][0]?>" <?=$disabletxt?>>Book Now</button>
    <span style="color:red; display:none; font-size: 0.9rem;" id="errortxt1" >Booking Full </span>
-    </form>
-    <?php
-       if(isset($_POST['submit'])){
-        
-        if(!empty($_POST['Day']) && !empty($_POST['Time'])) {
-         if(!empty($_SESSION['id']))
-         {
-           
-           $advance=(string)(($futsals[0][5])*10/100);
-           $esewaid=uniqid();//created a uniqu id for every transaction
-           $bookingArray=array(
-             array("futsalID"=>$id,"day"=>$_POST['Day'],"time"=>$_POST['Time']),
-               );
-          $_SESSION['bookedDetails']=$bookingArray;
-          //getting the current host and port
-          $url= $_SERVER['HTTP_HOST']; 
-
-
-          $a='<div id="myModal" class="modal">
-          <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
-        <button type="button" class="btn-close"  aria-label="Close" onclick="closeForm()"></button>
-      </div>
-      <div class="modal-body">
-        <h1>Continue to Checkout</h1>
-        <span>10% should be paid for booking</span>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeForm()">Close</button>
-        <form action="https://uat.esewa.com.np/epay/main" method="POST" style="height: 1.5rem;">
-          <input value="'.$advance.'" name="tAmt" type="hidden">
-          <input value="'.$advance.'" name="amt" type="hidden">
-          <input value="0" name="txAmt" type="hidden">
-          <input value="0" name="psc" type="hidden">
-          <input value="0" name="pdc" type="hidden">
-          <input value="EPAYTEST" name="scd" type="hidden">
-          <input value="'.$esewaid.'" name="pid" type="hidden">
-          <input value="http://'.$url.'/BookingDetails.php?q=su" type="hidden" name="su">
-          <input value="http://'.$url.'/BookingDetails.php?q=fu" type="hidden" name="fu">
-          <input value="Yes" class="btn btn-primary" type="submit">
-          </form> 
-          
-      
-        
-      </div>
-    </div>
-  </div>
-          </div>';          
-        echo $a;
-        echo '<script type="text/javascript">',
-        'openForm();',
-        '</script>'
-   ;
-        }
-        else{
-          echo'<div id="loginModal" class="modal">
-          <div class="modal-dialog">
-    <div class="modal-content">
-     
-      <div class="modal-body">
-        <h1>Please Login First</h1>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeloginform()">Close</button>
-        <button type="button" class="btn btn-primary" onclick="redirect()">Continue to login</button>
-      </div>
-    </div>
-  </div>
-          </div>';          
-        
-        echo '<script type="text/javascript">',
-        'openloginModal();',
-        '</script>';
-
-        }
-        } else {
-          echo "<script type='text/javascript'>alert('Please select the Day and Time.');</script>";
-          
-         
-        }
-      }
-    
-    ?> 
-
-
-   
+    </form> 
     
   </div>
 </div>
@@ -426,7 +341,9 @@ if(isset($message))
  <?php include 'footer.html' ?> 
  <?php
  unset($_SESSION['selectedDate']);  
- unset($_SESSION['availableTime']);
+ unset($_SESSION['availableTime']); 
+ unset($_SESSION['bookedDetails']);
+ $message="";
  ?>
 </body>
 

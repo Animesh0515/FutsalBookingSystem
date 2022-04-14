@@ -8,7 +8,7 @@ if(isset($_POST['Time']) || isset($_POST['ID']))
     $id=$_POST['ID'];
 
    
-    $sql="select ft.FutsalTimeID,t.Time from futsaltime ft join time t on ft.TimeID=t.TimeID join futsalbooking fb on fb.FutsalTimeID=ft.FutsaltimeID where fb.bookedfor='{$time}' and ft.FutsalID={$id}";
+    $sql="select ft.FutsalTimeID,t.Time from futsaltime ft join time t on ft.TimeID=t.TimeID join futsalbooking fb on fb.FutsalTimeID=ft.FutsaltimeID where fb.bookedfor='{$time}' and ft.FutsalID={$id} and CancelledFlag='N'";
     $bookedTime = $conn->query($sql);
     if ($bookedTime) {
      $bookedTime = mysqli_fetch_all($bookedTime);
@@ -27,7 +27,7 @@ if(isset($_POST['Time']) || isset($_POST['ID']))
         $unserialized = array_map('unserialize',$diff);
         $_SESSION['availableTime']=$unserialized;
         $_SESSION['selectedDate']=$time;
-
+        $count=count($_SESSION['availableTime']);
         if(count($_SESSION['availableTime'])==0)
         {
             echo "full";
